@@ -1,0 +1,14 @@
+
+
+streamlit
+plotly
+prophet
+pulp
+langchain
+langchain-groq
+faiss-cpu
+sentence-transformers
+requests
+python-dotenv
+pandas
+numpy

@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Data files
+data/*.csv
+data/*.json
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Conda
+*.conda
+
