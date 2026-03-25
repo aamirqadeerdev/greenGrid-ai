@@ -1,10 +1,45 @@
 
 import streamlit as st
+import base64
+import os
 
 st.set_page_config(
     page_title="GreenGrid AI",
     layout="wide"
 )
+
+# --- Encode image to base64 for embedding ----------------------------------
+def get_image_base64(image_path):
+    with open(image_path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+image_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "For_greenGrid.jpg"
+)
+
+try:
+    img_b64 = get_image_base64(image_path)
+    img_html = f'<img src="data:image/jpeg;base64,{img_b64}" style="width:100%; max-height:320px; object-fit:cover; border-radius:14px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);">'
+except:
+    img_html = ""
+
+st.markdown("""
+<style>
+.main-header {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00cc44;
+    margin-bottom: 0px;
+}
+.sub-header {
+    font-size: 16px;
+    color: #888888;
+    margin-bottom: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Copyright watermark in sidebar
 st.sidebar.markdown("""
@@ -25,73 +60,18 @@ aamirqadeer.ca@gmail.com
 *Unauthorized copying prohibited*
 """)
 
-# Password Protection
-def check_password():
-    if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
-
-    if not st.session_state.authenticated:
-        st.markdown(
-            '<h1 style="color:#00cc44;">GreenGrid AI</h1>',
-            unsafe_allow_html=True
-        )
-        st.markdown("Smart Distributed Energy Resource Management")
-        st.divider()
-        st.subheader("Demo Access Required")
-        st.info("""
-        This is a proprietary demo application.
-        Please enter the access password to continue.
-        To request access contact:
-        **aamirqadeer.ca@gmail.com**
-        """)
-
-        password = st.text_input(
-            "Enter Demo Password",
-            type="password"
-        )
-
-        if st.button("Access Demo", type="primary"):
-            import os
-            correct_password = os.getenv(
-                "DEMO_PASSWORD", "GreenGrid2026"
-            )
-            if password == correct_password:
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.error("Incorrect password. Please try again.")
-                st.info("""
-                To request demo access please contact:
-                aamirqadeer.ca@gmail.com
-                """)
-        return False
-    return True
-
-if not check_password():
-    st.stop()
-
-# Custom CSS
-st.markdown("""
-<style>
-.main-header {
-    font-size: 32px;
-    font-weight: bold;
-    color: #00cc44;
-    margin-bottom: 0px;
-}
-.sub-header {
-    font-size: 16px;
-    color: #888888;
-    margin-bottom: 20px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# Main page header
+# --- Main page header ------------------------------------------------------
 st.markdown('<p class="main-header">GreenGrid AI</p>',
             unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Smart Distributed Energy Resource Management for Small Canadian Operators</p>',
+st.markdown('<p class="sub-header">Smart Distributed Energy Resource Management System: Engineered for North American Enterprise.</p>',
             unsafe_allow_html=True)
+
+# --- Image below title -----------------------------------------------------
+st.markdown(
+    f'<div style="margin-top:15px; margin-bottom:10px;">{img_html}</div>',
+    unsafe_allow_html=True
+)
+
 st.divider()
 
 # Welcome message

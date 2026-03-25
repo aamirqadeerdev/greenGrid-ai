@@ -134,7 +134,7 @@ with col1:
     # Solar PV Card
     solar_pct = (latest['solar_kw'] / config.SOLAR_CAPACITY_KW) * 100
     st.markdown("**Solar PV System**")
-    st.progress(int(solar_pct) / 100)
+    st.progress(int(min(solar_pct, 100)) / 100)
     st.markdown(f"""
     - Output: **{latest['solar_kw']:.0f} kW** of {config.SOLAR_CAPACITY_KW} kW capacity
     - Capacity Factor: **{solar_pct:.1f}%**
@@ -159,9 +159,8 @@ with col2:
     # BESS Card
     soc = latest['bess_soc_pct']
     bess_status = "Charging" if latest['bess_kw'] > 0 else "Discharging" if latest['bess_kw'] < 0 else "Idle"
-    bess_color = "normal" if 30 <= soc <= 80 else "inverse"
     st.markdown("**Battery Energy Storage (BESS)**")
-    st.progress(int(soc) / 100)
+    st.progress(int(min(soc, 100)) / 100)
     st.markdown(f"""
     - State of Charge: **{soc:.0f}%**
     - Power: **{abs(latest['bess_kw']):.0f} kW** ({bess_status})
@@ -187,7 +186,6 @@ with col3:
     # Grid Connection Card
     grid = latest['grid_kw']
     grid_status = "Exporting" if grid < 0 else "Importing"
-    grid_color = "#00cc44" if grid < 0 else "#ff4444"
     st.markdown("**Grid Connection**")
     st.markdown(f"""
     - Power Flow: **{abs(grid):.0f} kW {grid_status}**
@@ -301,10 +299,3 @@ with col2:
 
 st.divider()
 st.caption("GreenGrid AI v1.0 — Data refreshes every 30 seconds — All values simulated for demonstration")
-
-
-
-
-
-
-

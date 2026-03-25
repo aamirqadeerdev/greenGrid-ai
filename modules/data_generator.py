@@ -86,7 +86,11 @@ def generate_grid(solar, wind, load, bess):
         grid.append(round(net, 2))
     return grid
 
+import streamlit as st
+
+@st.cache_data(ttl=30)
 def get_der_dataframe(hours=48):
+    
     timestamps = generate_timestamps(hours)
     solar = generate_solar(timestamps)
     wind = generate_wind(timestamps)

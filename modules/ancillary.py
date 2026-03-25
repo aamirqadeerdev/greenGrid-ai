@@ -1,4 +1,5 @@
 
+
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
@@ -6,8 +7,10 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
+import streamlit as st
 
 
+@st.cache_data(ttl=30)
 def get_grid_frequency():
     base_freq = config.GRID_FREQUENCY_HZ
     deviation = np.random.normal(0, 0.05)
@@ -37,6 +40,7 @@ def get_grid_frequency():
     }
 
 
+@st.cache_data(ttl=30)
 def get_voltage_status():
     nominal = config.VOLTAGE_NOMINAL_V
     deviation_pct = np.random.normal(0, 0.02)
@@ -68,6 +72,7 @@ def get_voltage_status():
     }
 
 
+@st.cache_data(ttl=30)
 def get_spinning_reserve():
     available = config.BESS_MAX_RATE_KW * np.random.uniform(0.5, 0.9)
     required = config.BESS_MAX_RATE_KW * 0.4
@@ -154,7 +159,8 @@ def generate_grid_events(num_events=10):
             "event": event_type,
             "severity": severity,
             "duration_min": duration,
-            "response": "Automatic" if severity == "INFO" else "Manual review",
+            "response": "Automatic" if severity == "INFO"
+            else "Manual review",
             "status": "Resolved"
         })
 
@@ -164,7 +170,7 @@ def generate_grid_events(num_events=10):
 
 def get_frequency_history(hours=4):
     now = datetime.now().replace(minute=0, second=0, microsecond=0)
-    timestamps = [now - timedelta(minutes=i*5)
+    timestamps = [now - timedelta(minutes=i * 5)
                   for i in range(hours * 12, 0, -1)]
     frequencies = [
         round(config.GRID_FREQUENCY_HZ + np.random.normal(0, 0.03), 3)
@@ -191,5 +197,4 @@ def get_ancillary_revenue():
             np.random.uniform(200, 600), 2
         )
     }
-
 

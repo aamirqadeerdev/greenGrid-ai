@@ -380,4 +380,3 @@ cloud cover and wind speeds of **{weather_summary['avg_wind']} m/s.**
 """)
 
 st.caption("GreenGrid AI v1.0 — Forecasts powered by Prophet ML + Open-Meteo Weather API")
-

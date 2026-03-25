@@ -339,3 +339,4 @@ Current recommendation: {bid_rec['recommendation']}
 
 st.caption("GreenGrid AI v1.0 — VPP powered by aggregated DER assets across Ontario and Alberta")
 
+

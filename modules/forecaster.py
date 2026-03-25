@@ -11,6 +11,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from modules.data_generator import get_der_dataframe
 import config
+import streamlit as st
 
 
 def prepare_prophet_data(df, column):
@@ -55,21 +56,25 @@ def train_and_forecast(df, column, horizon_hours=24):
     return forecast_only
 
 
+@st.cache_data(ttl=3600)
 def get_solar_forecast(horizon_hours=24):
     df = get_der_dataframe(hours=168)
     return train_and_forecast(df, 'solar_kw', horizon_hours)
 
 
+@st.cache_data(ttl=3600)
 def get_wind_forecast(horizon_hours=24):
     df = get_der_dataframe(hours=168)
     return train_and_forecast(df, 'wind_kw', horizon_hours)
 
 
+@st.cache_data(ttl=3600)
 def get_load_forecast(horizon_hours=24):
     df = get_der_dataframe(hours=168)
     return train_and_forecast(df, 'load_kw', horizon_hours)
 
 
+@st.cache_data(ttl=3600)
 def get_net_load_forecast(horizon_hours=24):
     solar = get_solar_forecast(horizon_hours)
     wind = get_wind_forecast(horizon_hours)

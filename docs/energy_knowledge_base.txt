@@ -1,321 +1,335 @@
+# GreenGrid AI — Canadian Energy Knowledge Base
+# Version 1.0 | For use with LangChain RAG Advisor
 
-════════════════════════════════════════════════════════════════
-GREENGRIDAD AI — ENERGY KNOWLEDGE BASE
-For AI Advisor Reference Document
-Version 1.0 — March 2026
-════════════════════════════════════════════════════════════════
-
-
-SECTION 1 — CANADIAN ELECTRICITY PRICING
-────────────────────────────────────────────────────────────────
-
-Ontario Time of Use Pricing (IESO)
-Off-Peak Hours: 7.4 cents per kilowatt hour
-Applies overnight from 7pm to 7am weekdays
-and all day weekends and holidays.
-This is the cheapest time to charge batteries and EVs.
-
-Mid-Peak Hours: 11.3 cents per kilowatt hour
-Applies from 7am to 11am and 5pm to 7pm on weekdays.
-Medium cost — avoid large loads if possible.
-
-On-Peak Hours: 17.0 cents per kilowatt hour
-Applies from 11am to 5pm on weekdays.
-Most expensive time — use stored battery power instead.
-
-Alberta Pool Price (AESO)
-Alberta uses a real-time market price that changes every hour.
-Average price is approximately 8.5 cents per kilowatt hour.
-Prices spike during cold winter mornings and hot summer afternoons.
-Battery storage is very valuable in Alberta due to price volatility.
-
-BC Hydro Time of Use
-Off-Peak: 9.4 cents per kilowatt hour
-On-Peak: 14.2 cents per kilowatt hour
-Peak hours are 4pm to 9pm on weekdays.
-
-
-SECTION 2 — BATTERY ENERGY STORAGE (BESS) GUIDELINES
-────────────────────────────────────────────────────────────────
-
-Safe Operating Range
-Always keep battery between 20% and 90% state of charge.
-Never discharge below 20% — damages battery cells permanently.
-Never charge above 90% — reduces long term capacity.
-This range preserves battery life for 10 to 15 years.
-
-Charging Strategy
-Charge battery during off-peak hours when electricity is cheapest.
-In Ontario charge between 7pm and 7am.
-Use solar energy to charge during daytime when available.
-Never charge battery during on-peak hours unless emergency.
-
-Discharging Strategy
-Discharge battery during on-peak hours to avoid expensive grid electricity.
-In Ontario discharge between 11am and 5pm.
-Also discharge during grid frequency events when IESO requests.
-Keep minimum 20% reserve for emergency backup power.
-
-Battery Health Monitoring
-Monitor state of charge every 15 minutes.
-Alert when SOC drops below 25% — approaching minimum safe level.
-Alert when SOC exceeds 88% — approaching maximum safe level.
-Track number of charge cycles — lithium batteries last 3000 to 6000 cycles.
-One full cycle per day = 10 to 16 years of battery life.
-
-
-SECTION 3 — SOLAR PV GUIDELINES
-────────────────────────────────────────────────────────────────
-
-Expected Performance
-Solar panels produce maximum output at solar noon — typically 12pm to 1pm local time.
-Output follows a bell curve — low in morning high at noon low in evening.
-Zero output at night and during heavy snow coverage.
-Cloud cover reduces output by 10% to 80% depending on cloud thickness.
-
-Performance Factors
-Panel efficiency: typically 18% to 22% for modern panels.
-Temperature coefficient: output decreases 0.3% to 0.5% per degree Celsius above 25°C.
-Inverter efficiency: typically 96% to 98%.
-Dust and soiling: reduces output by 2% to 5% — clean panels quarterly.
-
-Troubleshooting Low Output
-If solar output is lower than expected check these causes in order:
-1. Cloud cover — check weather forecast for irradiance data
-2. Snow or ice on panels — inspect and clear if safe to do so
-3. Panel soiling or bird droppings — schedule cleaning
-4. Inverter fault — check inverter display for error codes
-5. Shading from new obstructions — trees or new buildings nearby
-6. Panel degradation — normal 0.5% per year reduction in output
-
-Canadian Solar Resources
-Ontario average solar irradiance: 4.2 peak sun hours per day
-Alberta average solar irradiance: 4.8 peak sun hours per day
-BC average solar irradiance: 3.8 peak sun hours per day
-Saskatchewan average solar irradiance: 5.0 peak sun hours per day
-
-
-SECTION 4 — WIND TURBINE GUIDELINES
-────────────────────────────────────────────────────────────────
-
-Wind Power Basics
-Wind turbines start generating at cut-in wind speed of 3 to 4 metres per second.
-Maximum output at rated wind speed of 12 to 14 metres per second.
-Turbine shuts down automatically above 25 metres per second for safety.
-Output follows cube law — doubling wind speed increases power by 8 times.
-
-Small Wind Turbine Performance
-Capacity factor for small turbines: 20% to 35% of rated capacity on average.
-Wind is more variable than solar — wider forecast uncertainty.
-Wind often blows stronger at night — complementary to solar generation.
-Annual energy production = rated capacity x capacity factor x 8760 hours.
-
-Maintenance Schedule
-Monthly: visual inspection of blades and tower
-Quarterly: check blade condition and bolt torques
-Annual: professional inspection of gearbox and generator
-Every 5 years: major overhaul of all mechanical components
-
-
-SECTION 5 — IESO ONTARIO MARKET PARTICIPATION
-────────────────────────────────────────────────────────────────
-
-How to Register for IESO Markets
-Step 1: Contact IESO at ieso.ca and request market participant registration
-Step 2: Complete technical qualification testing of your system
-Step 3: Install IESO-approved interval metering at point of common coupling
-Step 4: Sign market participant agreement with IESO
-Step 5: Complete IESO training courses for market participation
-Step 6: Submit day-ahead offers through IESO Energy Trading System
-Process takes approximately 3 to 6 months from application to first trade.
-
-IESO Demand Response Program
-IESO runs seasonal demand response auctions twice per year.
-Participants commit to reduce load by a specified amount when called.
-Payment has two components: availability payment and performance payment.
-Availability payment: paid monthly just for being registered and ready.
-Performance payment: paid when actually called to reduce load.
-Minimum size: 100 kilowatts for direct participation.
-Smaller systems can participate through an aggregator like GreenGrid AI.
-
-Hourly Ontario Energy Price (HOEP)
-Real-time wholesale electricity price updated every hour.
-Available at ieso.ca under market data section.
-Used to calculate optimal battery dispatch timing.
-When HOEP exceeds 10 cents per kilowatt hour consider selling battery power.
-
-
-SECTION 6 — AESO ALBERTA MARKET PARTICIPATION
-────────────────────────────────────────────────────────────────
-
-How to Register for AESO Markets
-Step 1: Apply for market participant registration at aeso.ca
-Step 2: Complete AESO registration forms and technical requirements
-Step 3: Install approved metering and communication equipment
-Step 4: Pass AESO system access service tests
-Step 5: Register each generating unit separately with AESO
-Process takes approximately 2 to 4 months.
-
-Alberta Energy Pool Price
-Real-time price updated every hour — highly volatile.
-Ranges from near zero to 999 Canadian dollars per megawatt hour.
-Highest prices occur during cold snaps in January and February.
-Battery storage extremely valuable for capturing price spikes.
-Price data available at aeso.ca under market and system reporting.
-
-Alberta Micro-generation Program
-Systems under 5 megawatts can register under micro-generation regulation.
-Excess electricity credited against your bill at retail rate.
-No complex market registration required for small systems.
-Administered through your local distribution company.
-
-
-SECTION 7 — NERC CIP CYBERSECURITY REQUIREMENTS
-────────────────────────────────────────────────────────────────
-
-What is NERC CIP
-NERC CIP stands for North American Electric Reliability Corporation
-Critical Infrastructure Protection standards.
-These are mandatory cybersecurity requirements for grid-connected systems.
-Violations can result in fines of 1000 to 1000000 Canadian dollars per day.
-
-Basic Requirements for Small DER Operators
-CIP-002: Identify which of your systems connect to the grid.
-Document your solar inverters battery management system
-and any communication devices connected to grid networks.
-
-CIP-003: Create a cybersecurity policy document.
-Designate one person responsible for cybersecurity.
-Review and update policy annually.
-
-CIP-005: Protect your network boundary.
-Use a firewall between your DER systems and the internet.
-Only allow necessary network connections.
-Document all electronic access points.
-
-CIP-007: Keep software updated.
-Apply security patches within 35 days of release.
-Disable all unnecessary network ports and services.
-Use strong passwords — minimum 15 characters.
-Enable logging of all login attempts.
-
-CIP-011: Protect sensitive information.
-Do not share system configuration details publicly.
-Store system passwords securely — use a password manager.
-Shred or securely delete documents containing system details.
-
-
-SECTION 8 — CANADIAN NET METERING BY PROVINCE
-────────────────────────────────────────────────────────────────
-
-Ontario Net Metering
-Program: Net Metering through local distribution company
-Maximum system size: 250 kilowatts
-How it works: excess electricity credited to next bill
-Credit rate: retail electricity rate
-Annual settlement: unused credits expire each April
-How to apply: contact your local distribution company
-
-British Columbia Net Metering
-Program: BC Hydro Net Metering
-Maximum system size: 100 kilowatts
-How it works: excess electricity credited at BC Hydro retail rate
-Annual settlement: April reconciliation each year
-How to apply: bchydro.com net metering application
-
-Alberta Micro-generation
-Program: AUC Rule 024 Micro-generation
-Maximum system size: 5 megawatts
-How it works: excess electricity offset against consumption
-Credit rate: current regulated rate option rate
-How to apply: contact your local distribution company
-
-Saskatchewan Net Metering
-Program: SaskPower Net Metering
-Maximum system size: 100 kilowatts
-Monthly credit settlement
-How to apply: saskpower.com net metering
-
-Manitoba Net Metering
-Program: Manitoba Hydro Net Metering
-Maximum system size: 100 kilowatts
-Annual credit settlement
-How to apply: hydro.mb.ca net metering
-
-
-SECTION 9 — CANADIAN GOVERNMENT INCENTIVES
-────────────────────────────────────────────────────────────────
-
-Canada Greener Homes Grant
-Amount: up to 5000 Canadian dollars
-Eligible upgrades: heat pumps insulation windows solar panels
-Requirements: pre and post energy audit by registered energy advisor
-How to apply: canada.ca greener homes grant
-Note: Must apply before starting work — retroactive applications not accepted
-
-Clean Energy for Rural and Remote Communities
-Administered by Natural Resources Canada
-Funding for off-grid and remote communities replacing diesel generation
-Amount: up to 10 million Canadian dollars per project
-Eligible: First Nations communities remote municipalities cooperatives
-How to apply: nrcan.gc.ca clean energy rural remote
-
-Investment Tax Credit for Clean Energy
-Federal tax credit of 30% for clean energy equipment investments
-Applies to solar wind battery storage and related equipment
-Available from 2024 through 2034
-Claim through corporate income tax return
-
-
-SECTION 10 — FREQUENTLY ASKED QUESTIONS
-────────────────────────────────────────────────────────────────
-
-Q: Why is my solar output lower than expected today?
-A: The most common causes are cloud cover reducing irradiance,
-snow or dirt on panels, inverter operating in reduced power mode
-due to high temperature, or shading from nearby objects.
-Check the weather data on the Forecasting page for current
-irradiance levels and compare to your actual output.
-
-Q: When is the best time to charge my battery tonight?
-A: In Ontario the cheapest electricity is available from
-7pm to 7am. Set your battery to charge between 11pm and 5am
-for maximum savings when overnight demand is lowest and
-prices are at their minimum.
-
-Q: How do I join the IESO demand response program?
-A: Contact IESO at ieso.ca and request information about
-the Demand Response Auction. You need at least 100 kilowatts
-of controllable load or generation. GreenGrid AI can aggregate
-your system with other small operators to meet this minimum.
-The registration process takes 3 to 6 months.
-
-Q: What is my carbon offset worth in Canadian dollars?
-A: Each tonne of CO2 avoided is worth approximately 50 to 80
-Canadian dollars in the voluntary carbon market. Your solar
-system avoids approximately 0.21 kilograms of CO2 per kilowatt
-hour generated. A 500 kilowatt system generating 600 megawatt
-hours per year avoids 126 tonnes of CO2 worth approximately
-6300 to 10000 Canadian dollars annually.
-
-Q: Should I upgrade from 300 kWh to 500 kWh battery?
-A: This depends on your daily energy pattern. If your battery
-regularly reaches 90% charge by noon and discharges to 20%
-by 9pm you are constrained by capacity and an upgrade makes
-sense. If your battery rarely reaches above 70% you have
-excess capacity and upgrading would not improve economics.
-Check the Live Dashboard battery SOC chart for guidance.
-
-Q: Am I eligible for the Canada Greener Homes Grant?
-A: The grant is available to Canadian homeowners for primary
-residences only — not commercial properties. If your DER
-installation is at your home you may qualify for up to
-5000 Canadian dollars. Apply at canada.ca before starting
-any new work as retroactive applications are not accepted.
-
-Q: How much is my frequency regulation service worth?
-A: For a 150 kilowatt battery registered for frequency
-regulation with IESO you can expect approximately 120 to
-300 Canadian dollars per month in availability payments
-plus additional performance payments when called upon.
-Registration takes 3 to 6 months through IESO.
+========================================
+ONTARIO ELECTRICITY PRICING — IESO
+========================================
+
+Ontario uses Time-of-Use (TOU) pricing managed by the Independent Electricity System Operator (IESO).
+
+Ontario TOU Rates (approximate, subject to change):
+- Off-Peak: CAD 0.087 per kWh (evenings, weekends, holidays)
+- Mid-Peak: CAD 0.113 per kWh (shoulder hours)
+- On-Peak: CAD 0.179 per kWh (weekday mornings and afternoons)
+
+Summer On-Peak hours (November to October): 11am to 5pm weekdays
+Winter On-Peak hours: 7am to 11am and 5pm to 7pm weekdays
+
+The Global Adjustment (GA) is an additional charge added to electricity bills in Ontario. It recovers the cost of building and maintaining generation and conservation programs. The GA can be larger than the actual energy commodity cost.
+
+Ontario also offers ultra-low overnight rates from 11pm to 7am at approximately CAD 0.024 per kWh for eligible customers.
+
+To register for IESO programs, DER operators must apply through a licensed electricity retailer or directly through IESO's registration portal at ieso.ca. Operators need a Smart Metering Entity (SME) compliant meter and a Market Participant Agreement.
+
+Ontario Demand Response programs allow large consumers and DER operators to reduce consumption during peak periods in exchange for financial payments. The IESO's Demand Response Auction allows participants to bid capacity into the market.
+
+========================================
+ALBERTA ELECTRICITY PRICING — AESO
+========================================
+
+Alberta operates a deregulated electricity market managed by the Alberta Electric System Operator (AESO).
+
+Alberta uses a real-time pool price system. The pool price fluctuates every hour based on supply and demand. The average pool price is typically between CAD 40 and CAD 120 per MWh but can spike dramatically during cold snaps or high demand periods.
+
+DER operators in Alberta can participate in the Balancing Pool market. Battery storage operators can buy power at low prices and sell at high prices.
+
+Alberta's Regulated Rate Option (RRO) is a default rate for customers who have not chosen a retailer. It is set monthly and provides a baseline for comparison.
+
+AESO's Energy Storage Participation Model allows batteries and other flexible resources to participate in energy and ancillary services markets. Registration requires connecting with a Power Pool Participant.
+
+To connect to the Alberta grid, DER operators must follow AESO's Connection Process which involves a Connection Application, System Impact Assessment, and Facilities Study.
+
+========================================
+BC HYDRO RATES
+========================================
+
+BC Hydro uses a tiered rate structure:
+- Tier 1 (first 1,350 kWh per two months): approximately CAD 0.0938 per kWh
+- Tier 2 (above 1,350 kWh per two months): approximately CAD 0.1408 per kWh
+
+BC Hydro offers net metering for customers with renewable generation up to 100 kW. Excess generation is credited at the full retail rate. Annual true-up occurs in March.
+
+BC Hydro's demand charges apply to commercial customers based on peak demand measured in 15-minute intervals. Batteries and demand management systems can significantly reduce these charges.
+
+========================================
+BATTERY ENERGY STORAGE SYSTEMS (BESS)
+========================================
+
+Best Practices for Battery Charging:
+- Charge batteries during off-peak hours when electricity prices are lowest
+- In Ontario, the best charging window is 11pm to 7am (ultra-low overnight rate)
+- Avoid charging during on-peak hours (typically 11am to 5pm in summer)
+- Maintain state of charge (SOC) between 20% and 90% for maximum battery longevity
+- Lithium iron phosphate (LFP) batteries tolerate higher SOC better than NMC chemistry
+
+Battery Sizing Guidelines:
+- Rule of thumb: size battery to cover 4 to 8 hours of peak load reduction
+- For a 100 kW peak demand, a 400 to 800 kWh battery is typical
+- Consider round-trip efficiency of 85 to 92% when calculating economics
+- Include degradation rate of approximately 2 to 3% per year in financial models
+
+For a 300 kWh battery upgrade to 500 kWh, the incremental 200 kWh at CAD 400 to 600 per kWh installed equals CAD 80,000 to 120,000 capital cost. At Ontario TOU savings of CAD 0.09 per kWh cycle, daily savings of approximately CAD 18 means payback in 12 to 18 years without incentives. NRCan grants can reduce this significantly.
+
+Battery State of Health (SOH) monitoring is critical. A battery at 80% SOH has lost 20% of its original capacity. Replace or recondition when SOH drops below 70%.
+
+Temperature affects battery performance significantly. Below 0 degrees Celsius, lithium batteries lose 20 to 40% of capacity temporarily. Install thermal management systems in Canadian climate installations.
+
+========================================
+SOLAR PHOTOVOLTAIC (PV) PERFORMANCE
+========================================
+
+Why Solar Output May Be Lower Than Expected:
+1. Soiling and dust accumulation — clean panels every 3 to 6 months
+2. Shading from nearby structures, trees, or snow — inspect for new obstructions
+3. Inverter clipping — occurs when generation exceeds inverter rated capacity
+4. Module degradation — panels lose approximately 0.5% per year
+5. High temperature — panels lose approximately 0.4% per degree Celsius above 25C
+6. Cloud cover and low irradiance — check weather forecast against production data
+7. Grid curtailment — check with your utility if output stops suddenly on sunny days
+8. String mismatch — one shaded or degraded panel reduces entire string output
+
+Solar performance ratio should be 75 to 85% under normal conditions. If your performance ratio falls below 70%, schedule a professional inspection.
+
+In Ontario, average solar irradiance is approximately 3.5 to 4.5 peak sun hours per day depending on location. Southern Ontario receives more irradiance than northern regions.
+
+Net Metering for Solar in Canada:
+- Ontario: net metering available up to 10 MW capacity, excess credited monthly
+- Alberta: micro-generation regulation allows systems up to 5 MW
+- BC: net metering up to 100 kW, excess credited at retail rate
+- Quebec: Hydro-Quebec net metering for systems under 50 kW
+
+========================================
+WIND TURBINE PERFORMANCE
+========================================
+
+Wind turbine output depends on wind speed cubed. Doubling wind speed increases power output by 8 times.
+
+Typical small wind turbine performance:
+- Cut-in wind speed: 3 to 4 m/s (system starts generating)
+- Rated wind speed: 11 to 13 m/s (reaches maximum output)
+- Cut-out wind speed: 20 to 25 m/s (shuts down for safety)
+
+Common wind turbine issues:
+1. Yaw misalignment — turbine not facing into the wind correctly
+2. Blade icing in Canadian winters — install de-icing systems for northern installations
+3. Gearbox wear — schedule oil changes every 12 to 18 months
+4. Brake pad wear — inspect annually
+5. Tower vibration — check guy wires and foundation annually
+
+Wind resources in Canada vary significantly. Alberta prairies and coastal BC have the strongest resources. Ontario has moderate wind resources, strongest along Lake Erie and Lake Huron shorelines.
+
+========================================
+PEAK DEMAND MANAGEMENT
+========================================
+
+Demand charges can represent 30 to 50% of a commercial electricity bill. Reducing peak demand by even 10% can significantly reduce bills.
+
+Strategies for Peak Demand Management:
+1. Battery discharge during peak demand windows
+2. Load shifting — move flexible loads (EV charging, HVAC pre-cooling) to off-peak
+3. Demand response participation — get paid to reduce load on demand
+4. Building automation — smart thermostats and automated load control
+5. Variable frequency drives on motors — reduce startup current spikes
+
+In Ontario, demand is typically measured as the highest 15-minute average in the billing month. One high-demand event can increase demand charges for the entire month.
+
+For EV fleets, smart charging is essential. Schedule all EVs to charge at 80% state of charge overnight and target completion by 6am to avoid morning peak demand.
+
+========================================
+VIRTUAL POWER PLANTS (VPP)
+========================================
+
+A Virtual Power Plant is a network of distributed energy resources — solar panels, batteries, wind turbines, and flexible loads — coordinated by software to act as a single power plant.
+
+How to Join a Virtual Power Plant in Canada:
+1. Contact your local utility or grid operator (IESO in Ontario, AESO in Alberta)
+2. Ensure your DER assets meet technical interconnection requirements
+3. Install a communications-enabled inverter or battery management system with API access
+4. Sign a VPP Aggregation Agreement with the VPP operator
+5. Allow the VPP operator to dispatch your assets during grid events in exchange for revenue
+
+VPP Revenue Streams:
+- Capacity payments: CAD 50 to 150 per kW-year for committed capacity
+- Energy arbitrage: buy low, sell high on spot markets
+- Ancillary services: frequency regulation, spinning reserve
+- Demand response: payments for reducing load on request
+
+A typical 500 kWh battery in an Ontario VPP can earn CAD 8,000 to 25,000 per year depending on market participation and dispatch frequency.
+
+========================================
+ANCILLARY SERVICES
+========================================
+
+NERC BAL-002 — Disturbance Control Standard:
+Requires balancing authorities to restore frequency to 60.00 Hz within 15 minutes of a disturbance. DER operators providing spinning reserve must be able to respond within 10 minutes.
+
+Frequency Regulation:
+- Target frequency in North America: 60.00 Hz
+- Acceptable operating range: 59.95 to 60.05 Hz
+- Under-frequency load shedding begins at approximately 59.3 Hz
+- Batteries are ideal for frequency regulation due to fast response time (milliseconds)
+- Frequency regulation in Ontario earns approximately CAD 5 to 15 per MW per hour
+
+Voltage Support:
+- Distribution voltage is typically 120/240V in Canada
+- Inverter-based DERs can provide reactive power (VAR) support
+- IEEE 1547-2018 requires advanced inverter functions including volt-VAR optimization
+
+Spinning Reserve:
+- Must be online and synchronized to the grid
+- Must respond within 10 minutes to a dispatch signal
+- Pays approximately CAD 3 to 8 per MW per hour in Ontario
+
+Black Start:
+- Capability to restart generation without external power after a blackout
+- Pays premium rates due to critical reliability value
+- Requires specialized equipment and testing protocols
+
+========================================
+NERC CIP CYBERSECURITY REQUIREMENTS
+========================================
+
+NERC CIP (Critical Infrastructure Protection) standards apply to bulk electric system assets. Small DER operators (under 75 MVA) are generally exempt from most NERC CIP requirements but should follow best practices.
+
+Key cybersecurity practices for small DER operators:
+1. CIP-005: Electronic Security Perimeters — isolate control systems from business networks
+2. Use encrypted communications for all remote monitoring and control
+3. Implement multi-factor authentication for system access
+4. Maintain audit logs of all system access and changes
+5. Conduct annual cybersecurity training for all staff
+6. Have an incident response plan for cyber events
+7. Keep all software and firmware updated
+
+For operators that do meet NERC CIP thresholds, compliance involves registration as a Generator Owner and Generator Operator with NERC, annual audits, and significant documentation requirements.
+
+========================================
+CANADIAN GOVERNMENT GRANTS AND INCENTIVES
+========================================
+
+Natural Resources Canada (NRCan) Programs:
+
+Canada Greener Homes Grant:
+- Up to CAD 5,000 for energy efficiency retrofits for homeowners
+- Includes battery storage, solar panels, heat pumps
+- Requires pre and post EnerGuide evaluation
+
+Canada Growth Fund — Clean Electricity:
+- Supports large-scale clean energy projects
+- Available for commercial and industrial DER operators
+- Focuses on projects that reduce emissions by at least 1 megaton
+
+Strategic Innovation Fund — Net Zero Accelerator:
+- For large industrial emitters
+- Supports technology adoption and clean energy transition
+
+Investment Tax Credit for Clean Technology:
+- 30% refundable tax credit on capital cost of eligible clean technology equipment
+- Includes solar, wind, batteries, and inverters purchased after 2023
+- Small businesses can receive this as a cash refund even with no tax owing
+
+Canada Infrastructure Bank:
+- Low-interest loans for clean energy infrastructure
+- Available for projects over CAD 10 million
+- Supports Indigenous and remote community energy projects
+
+Provincial Programs:
+- Ontario: saveONenergy for business offers incentives for demand management
+- Alberta: Emissions Reduction Alberta funds clean energy technology
+- BC: CleanBC industrial incentive program
+
+To apply for NRCan grants, visit nrcan.gc.ca and create a My NRCan account. Most programs require project pre-approval before work begins.
+
+========================================
+CARBON OFFSETS IN CANADA
+========================================
+
+Canada's federal carbon price is CAD 65 per tonne of CO2 in 2024, rising to CAD 170 per tonne by 2030.
+
+Carbon Offset Calculation for Solar PV:
+- Ontario grid emission factor: approximately 35 grams CO2 per kWh (very clean grid)
+- Alberta grid emission factor: approximately 550 grams CO2 per kWh (coal and gas heavy)
+- A 100 kW solar system in Alberta generating 150,000 kWh per year avoids approximately 82.5 tonnes CO2
+- At CAD 65 per tonne, this equals approximately CAD 5,362 per year in carbon value
+
+To generate verified carbon offsets in Canada:
+1. Register under a recognized standard (Gold Standard, Verra VCS, or Canadian federal protocol)
+2. Document baseline emissions and additionality
+3. Conduct third-party verification annually
+4. List credits on a registry for sale
+
+Carbon credits can be sold to large emitters who need to comply with federal Output-Based Pricing System (OBPS) requirements.
+
+========================================
+NET METERING BY PROVINCE
+========================================
+
+Ontario Net Metering:
+- Available for systems up to 10 MW
+- Excess generation credited at retail rate on monthly bill
+- Annual true-up in April — excess credits may not be carried over
+- Apply through your local distribution company (LDC)
+
+Alberta Micro-Generation:
+- Available for systems up to 5 MW
+- Credits valued at pool price for excess generation
+- Can roll over for 12 months
+- Apply through your regulated rate provider or retailer
+
+British Columbia Net Metering:
+- Available for systems up to 100 kW (BC Hydro)
+- Excess credited at applicable retail rate
+- Annual true-up in March
+- Apply directly to BC Hydro
+
+Saskatchewan Net Metering:
+- Available for systems up to 100 kW through SaskPower
+- Excess generation credited at avoided cost rate (lower than retail)
+
+Manitoba Net Metering:
+- Available for systems up to 1 MW through Manitoba Hydro
+- Excess credited at retail rate monthly
+
+Quebec Net Metering:
+- Available for systems under 50 kW through Hydro-Quebec
+- Excess credited at retail rate
+
+========================================
+IEEE 1547 — INTERCONNECTION STANDARD
+========================================
+
+IEEE 1547-2018 is the standard for interconnection of distributed energy resources with electric power systems in North America.
+
+Key Requirements:
+1. Voltage and frequency trip settings — DER must disconnect if voltage or frequency goes outside acceptable range
+2. Anti-islanding protection — DER must detect and respond to grid loss within 2 seconds
+3. Reconnection delay — DER must wait 5 minutes minimum after grid restoration before reconnecting
+4. Advanced inverter functions (mandatory as of 2022 in most jurisdictions):
+   - Volt-VAR optimization — adjust reactive power based on voltage
+   - Volt-Watt optimization — reduce real power output during high voltage conditions
+   - Frequency-Watt response — reduce output during high frequency events
+
+Compliance with IEEE 1547 is required for grid interconnection in all Canadian provinces. Your inverter manufacturer should confirm IEEE 1547-2018 certification. UL 1741 SA certification indicates compliance with advanced inverter functions.
+
+For new interconnection applications, your local distribution company will require an IEEE 1547 compliant inverter datasheet as part of the application package.
+
+========================================
+DEMAND RESPONSE PROGRAMS
+========================================
+
+Ontario IESO Demand Response:
+- Industrial Conservation Initiative (ICI): large consumers can reduce Global Adjustment by reducing demand during the top 5 peak hours of the year
+- Demand Response Auction: participants bid to provide demand reduction capacity
+- Emergency Demand Response: IESO can call for voluntary reductions during grid emergencies
+
+How to Participate in Demand Response:
+1. Identify flexible loads in your facility (HVAC, lighting, EV charging, process loads)
+2. Calculate your demand reduction capability in kW
+3. Register as a Demand Response Resource with IESO or your utility
+4. Install interval metering and control systems
+5. Respond to dispatch signals within the required timeframe (typically 10 to 30 minutes)
+6. Receive payment for committed capacity and actual performance
+
+Typical demand response payments in Ontario: CAD 20 to 60 per kW-year for committed capacity plus energy payments during events.
+
+For EV fleets, smart charging software can automatically pause or reduce charging in response to demand response signals, providing flexibility without disrupting operations.
+

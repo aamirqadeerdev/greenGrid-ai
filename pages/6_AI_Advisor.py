@@ -1,5 +1,8 @@
 
 
+from modules.ui_utils import hide_running_man
+hide_running_man()
+
 import streamlit as st
 import os
 import sys
@@ -13,10 +16,121 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 import config
+from modules.forecaster import (
+    get_solar_forecast,
+    get_wind_forecast,
+    get_load_forecast,
+    get_net_load_forecast
+)
 
 load_dotenv()
 
-# ─── Page Configuration ──────────────────────────────────────
+
+# --- Build Live Forecast Context -------------------------------------------
+def build_live_forecast_context():
+    """
+    Generates a plain-English summary of today's Prophet forecasts.
+    This is injected into every RAG prompt so the LLM can answer
+    time-specific questions about today's generation and export.
+    """
+    try:
+        solar_fc  = get_solar_forecast(horizon_hours=24)
+        wind_fc   = get_wind_forecast(horizon_hours=24)
+        load_fc   = get_load_forecast(horizon_hours=24)
+        net_fc    = get_net_load_forecast(horizon_hours=24)
+
+        # Peak solar
+        solar_peak_row  = solar_fc.loc[solar_fc['forecast'].idxmax()]
+        solar_peak_kw   = solar_peak_row['forecast']
+        solar_peak_time = solar_peak_row['timestamp'].strftime('%H:%M')
+
+        # Peak wind
+        wind_peak_row   = wind_fc.loc[wind_fc['forecast'].idxmax()]
+        wind_peak_kw    = wind_peak_row['forecast']
+        wind_peak_time  = wind_peak_row['timestamp'].strftime('%H:%M')
+
+        # Combined generation per hour — FIX: track solar and wind separately
+        combined = solar_fc.copy()
+        combined['solar_gen'] = solar_fc['forecast']
+        combined['wind_gen']  = wind_fc['forecast']
+        combined['total_gen'] = solar_fc['forecast'] + wind_fc['forecast']
+        combined['net_export'] = combined['total_gen'] - load_fc['forecast']
+
+        # Best export hour = highest (generation - load)
+        export_row   = combined.loc[combined['net_export'].idxmax()]
+        export_time  = export_row['timestamp'].strftime('%H:%M')
+        export_kw    = max(export_row['net_export'], 0)
+
+        # Total daily figures
+        total_solar_kwh  = round(solar_fc['forecast'].sum(), 0)
+        total_wind_kwh   = round(wind_fc['forecast'].sum(), 0)
+        total_load_kwh   = round(load_fc['forecast'].sum(), 0)
+        peak_load_kw     = round(load_fc['forecast'].max(), 0)
+        peak_load_time   = load_fc.loc[
+            load_fc['forecast'].idxmax(), 'timestamp'
+        ].strftime('%H:%M')
+
+        # Hours with surplus generation (export possible)
+        export_hours = combined[combined['net_export'] > 0]
+        if len(export_hours) > 0:
+            first_export = export_hours.iloc[0]['timestamp'].strftime('%H:%M')
+            last_export  = export_hours.iloc[-1]['timestamp'].strftime('%H:%M')
+            export_window = f"from {first_export} to {last_export}"
+        else:
+            export_window = "no surplus generation forecast today"
+
+        # Hourly breakdown — FIX: show solar, wind, total separately
+        hourly_lines = []
+        for _, row in combined.iterrows():
+            hour     = row['timestamp'].strftime('%H:%M')
+            solar    = row['solar_gen']
+            wind     = row['wind_gen']
+            total    = row['total_gen']
+            load_val = load_fc.loc[
+                load_fc['timestamp'] == row['timestamp'], 'forecast'
+            ]
+            load_val = load_val.values[0] if len(load_val) > 0 else 0
+            net      = total - load_val
+            status   = "SURPLUS — can export" if net > 0 else "DEFICIT — importing from grid"
+            hourly_lines.append(
+                f"  {hour}: Solar {solar:.0f} kW, Wind {wind:.0f} kW, "
+                f"Total Gen {total:.0f} kW, Load {load_val:.0f} kW, "
+                f"Net {net:+.0f} kW ({status})"
+            )
+        hourly_text = "\n".join(hourly_lines)
+
+        summary = f"""
+=== LIVE FORECAST DATA FOR TODAY ===
+(Generated from Prophet ML models — use this to answer time-specific questions)
+
+SOLAR FORECAST TODAY:
+- Total solar generation: {total_solar_kwh:.0f} kWh
+- Peak solar output: {solar_peak_kw:.0f} kW at {solar_peak_time}
+
+WIND FORECAST TODAY:
+- Total wind generation: {total_wind_kwh:.0f} kWh
+- Peak wind output: {wind_peak_kw:.0f} kW at {wind_peak_time}
+
+LOAD FORECAST TODAY:
+- Total load demand: {total_load_kwh:.0f} kWh
+- Peak load demand: {peak_load_kw:.0f} kW at {peak_load_time}
+
+EXPORT OPPORTUNITY TODAY:
+- Maximum export window: {export_window}
+- Best single hour for export: {export_time} with approximately {export_kw:.0f} kW surplus
+
+HOURLY GENERATION vs LOAD BREAKDOWN:
+(Each hour shows Solar, Wind, Total Generation, Load, and Net status)
+{hourly_text}
+=====================================
+"""
+        return summary
+
+    except Exception as e:
+        return f"\n=== LIVE FORECAST DATA: Unavailable ({str(e)}) ===\n"
+
+
+# --- Page Configuration ----------------------------------------------------
 st.set_page_config(page_title="AI Advisor", layout="wide")
 
 st.markdown('<h1 style="color:#00cc44;">AI Energy Advisor</h1>',
@@ -24,7 +138,8 @@ st.markdown('<h1 style="color:#00cc44;">AI Energy Advisor</h1>',
 st.markdown("Ask any question about your energy system in plain English")
 st.divider()
 
-# ─── Load Knowledge Base ──────────────────────────────────────
+
+# --- Load Knowledge Base ---------------------------------------------------
 @st.cache_resource
 def load_knowledge_base():
     docs_path = os.path.join(
@@ -59,19 +174,41 @@ def load_knowledge_base():
 
         prompt = PromptTemplate.from_template("""
 You are GreenGrid AI's expert energy advisor for small Canadian
-DER operators. You answer questions based strictly on the
-provided context about Canadian energy markets regulations
-and DER management best practices.
+DER operators. You answer questions using two sources:
 
-Always answer in plain English that a non-technical business
-owner can understand. Never use unexplained technical jargon.
+1. KNOWLEDGE BASE CONTEXT: General knowledge about Canadian energy
+   markets, regulations, battery best practices, solar/wind performance,
+   NERC compliance, grants and net metering.
+
+2. LIVE FORECAST DATA: Real-time Prophet ML forecast for TODAY showing
+   hourly solar generation, wind generation, load demand, and net
+   export/import at each hour.
+
+When a question is about TODAY (e.g. "when will I have maximum export",
+"what time should I charge my battery today", "when is peak generation"),
+use the LIVE FORECAST DATA to give a specific, time-based answer.
+
+IMPORTANT RULES FOR READING FORECAST DATA:
+- Each hour in the breakdown shows Solar, Wind, Total Generation, Load, and Net separately.
+- When asked about wind output at a specific time, read ONLY the Wind value for that hour.
+- When asked about solar output at a specific time, read ONLY the Solar value for that hour.
+- Peak wind output is the single highest Wind value across all hours.
+- Peak solar output is the single highest Solar value across all hours.
+- Never confuse Total Generation with Solar-only or Wind-only values.
+- Net = Total Generation minus Load. Positive Net means surplus (can export). Negative means deficit (importing).
+
+For general knowledge questions use the KNOWLEDGE BASE CONTEXT.
+
+Always answer in plain English that a non-technical business owner
+can understand. Never use unexplained technical jargon.
 If the answer involves money always use Canadian dollars.
-If you cannot find the answer in the context say:
-"I could not find specific information about this in my
-knowledge base. Please contact your grid operator or a
-qualified energy engineer for advice on this topic."
+If you cannot find the answer in either source say:
+"I could not find specific information about this in my knowledge base.
+Please contact your grid operator or a qualified energy engineer."
 
-Context: {context}
+Knowledge Base Context: {context}
+
+Live Forecast Data: {live_forecast}
 
 Chat History: {chat_history}
 
@@ -87,7 +224,7 @@ Answer in plain English:""")
         return None, None, False
 
 
-# ─── Initialize ───────────────────────────────────────────────
+# --- Initialize ------------------------------------------------------------
 chain, retriever, kb_loaded = load_knowledge_base()
 
 if not kb_loaded:
@@ -100,20 +237,30 @@ if not kb_loaded:
 
 st.success("AI Advisor ready — knowledge base loaded successfully")
 
-# ─── Example Questions ────────────────────────────────────────
+# Load live forecast once per session
+with st.spinner("Loading today's forecast data..."):
+    live_forecast_context = build_live_forecast_context()
+
+if "Unavailable" in live_forecast_context:
+    st.warning("Live forecast data unavailable — Advisor will answer from knowledge base only.")
+else:
+    st.info("Live forecast data loaded — I can answer questions about today's generation and export times.")
+
+
+# --- Example Questions -----------------------------------------------------
 st.subheader("Common Questions — Click to Ask")
 
 example_questions = [
-    "Why is my solar output lower than expected today?",
-    "When is the best time to charge my battery tonight?",
+    "At what time today will I have maximum energy to export?",
+    "When is the best time to charge my battery today?",
+    "What is my peak solar generation time today?",
+    "What is my peak wind generation time today?",
+    "What is the wind output at 5pm today?",
     "How do I register for IESO demand response program?",
     "What are my NERC CIP cybersecurity requirements?",
     "How much is my carbon offset worth in Canadian dollars?",
     "What government grants am I eligible for?",
     "Should I upgrade my battery from 300 kWh to 500 kWh?",
-    "What is the current Ontario electricity pricing schedule?",
-    "How does frequency regulation earn me money?",
-    "What is a Virtual Power Plant and how do I join one?"
 ]
 
 cols = st.columns(2)
@@ -124,7 +271,8 @@ for i, question in enumerate(example_questions):
 
 st.divider()
 
-# ─── Chat Interface ───────────────────────────────────────────
+
+# --- Chat Interface --------------------------------------------------------
 st.subheader("Ask Your Question")
 
 if "messages" not in st.session_state:
@@ -178,6 +326,7 @@ if question:
 
                 answer = chain.invoke({
                     "context": context,
+                    "live_forecast": live_forecast_context,
                     "chat_history": history_text,
                     "question": question
                 })
@@ -193,21 +342,32 @@ if question:
                 })
 
             except Exception as e:
-                error_msg = """
-                I encountered an error processing your question.
-                Please check your internet connection and
-                Groq API key and try again.
-                """
-                st.error(error_msg)
+                st.error(
+                    "I encountered an error processing your question. "
+                    "Please check your internet connection and "
+                    "Groq API key and try again."
+                )
 
 st.divider()
 
-# ─── Knowledge Base Topics ────────────────────────────────────
+
+# --- Knowledge Base Topics -------------------------------------------------
 st.subheader("Topics I Can Help With")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
+    st.markdown("""
+    **Today's Live Data**
+    - Maximum export time today
+    - Best battery charging window
+    - Peak solar generation hour
+    - Peak wind generation hour
+    - Hourly generation vs load
+    - Surplus energy windows
+    """)
+
+with col2:
     st.markdown("""
     **Canadian Electricity Markets**
     - Ontario IESO pricing and markets
@@ -215,16 +375,6 @@ with col1:
     - BC Hydro time of use rates
     - How to join energy markets
     - Demand response programs
-    """)
-
-with col2:
-    st.markdown("""
-    **DER Operations**
-    - Battery charging best practices
-    - Solar panel troubleshooting
-    - Wind turbine performance
-    - Peak demand management
-    - Net metering by province
     """)
 
 with col3:
@@ -238,5 +388,5 @@ with col3:
     """)
 
 st.divider()
-st.caption("GreenGrid AI v1.0 — AI Advisor powered by LangChain + Groq + Llama 3.3 70B")
+st.caption("GreenGrid AI v1.0 — AI Advisor powered by LangChain + Groq + Llama 3.3 70B + Live Prophet Forecasts")
 

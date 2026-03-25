@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import plotly.graph_objects as go
 import pandas as pd
@@ -345,3 +346,5 @@ in monthly demand charges.
 """)
 
 st.caption("GreenGrid AI v1.0 — Optimization powered by PuLP Linear Programming")
+
+

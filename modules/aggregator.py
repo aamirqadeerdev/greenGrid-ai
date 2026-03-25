@@ -7,9 +7,9 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
+import streamlit as st
 
 
-# Five simulated DER sites across Canada
 SITES = [
     {
         "id": 1,
@@ -79,6 +79,7 @@ SITES = [
 ]
 
 
+@st.cache_data(ttl=60)
 def get_site_status():
     statuses = []
     for site in SITES:
@@ -125,13 +126,17 @@ def get_vpp_aggregation(site_statuses):
     total_bess_kwh = sum(s["bess_capacity_kwh"] for s in site_statuses)
     total_bess_kw = sum(s["bess_kw"] for s in site_statuses)
     total_load = sum(s["load_kw"] for s in site_statuses)
-    avg_bess_soc = sum(s["bess_soc_pct"] for s in site_statuses) / len(site_statuses)
+    avg_bess_soc = sum(
+        s["bess_soc_pct"] for s in site_statuses
+    ) / len(site_statuses)
 
     dispatchable_kw = total_bess_kw * (avg_bess_soc / 100)
     available_capacity = total_solar + total_wind + dispatchable_kw
 
-    ieso_sites = [s for s in site_statuses if s["grid_operator"] == "IESO"]
-    aeso_sites = [s for s in site_statuses if s["grid_operator"] == "AESO"]
+    ieso_sites = [s for s in site_statuses
+                  if s["grid_operator"] == "IESO"]
+    aeso_sites = [s for s in site_statuses
+                  if s["grid_operator"] == "AESO"]
 
     return {
         "total_solar_kw": round(total_solar, 1),
@@ -152,6 +157,7 @@ def get_vpp_aggregation(site_statuses):
     }
 
 
+@st.cache_data(ttl=60)
 def get_market_data():
     hour = datetime.now().hour
     if 7 <= hour <= 11 or 17 <= hour <= 19:
@@ -163,7 +169,6 @@ def get_market_data():
 
     aeso_price = np.random.uniform(50, 120)
 
-    next_peak = None
     if hour < 7:
         next_peak = "07:00"
     elif hour < 17:
@@ -180,11 +185,14 @@ def get_market_data():
     }
 
 
+@st.cache_data(ttl=60)
 def get_revenue_data():
     daily_energy_revenue = np.random.uniform(800, 1500)
     daily_dr_revenue = np.random.uniform(200, 600)
     daily_ancillary_revenue = np.random.uniform(100, 300)
-    daily_total = daily_energy_revenue + daily_dr_revenue + daily_ancillary_revenue
+    daily_total = (daily_energy_revenue +
+                   daily_dr_revenue +
+                   daily_ancillary_revenue)
 
     return {
         "daily_energy_cad": round(daily_energy_revenue, 2),

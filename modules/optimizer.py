@@ -1,4 +1,5 @@
 
+
 import pandas as pd
 import numpy as np
 from pulp import (
@@ -9,6 +10,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
+import streamlit as st
 
 
 def get_ontario_prices(hours=24):
@@ -24,6 +26,7 @@ def get_ontario_prices(hours=24):
     return prices
 
 
+@st.cache_data(ttl=3600)
 def optimize_bess_schedule(
     load_forecast,
     solar_forecast,
@@ -74,9 +77,9 @@ def optimize_bess_schedule(
         "soc_pct": [max(0, value(soc[h])) / config.BESS_CAPACITY_KWH * 100
                     for h in range(hours)],
         "prices": prices,
-        "load": load_forecast[:hours],
-        "solar": solar_forecast[:hours],
-        "wind": wind_forecast[:hours]
+        "load": list(load_forecast[:hours]),
+        "solar": list(solar_forecast[:hours]),
+        "wind": list(wind_forecast[:hours])
     }
 
     total_cost = sum(results["grid_import_kw"][h] * prices[h]
@@ -93,6 +96,7 @@ def optimize_bess_schedule(
     return results
 
 
+@st.cache_data(ttl=3600)
 def optimize_ev_charging(
     departure_hour=8,
     target_soc_pct=90,
@@ -102,7 +106,9 @@ def optimize_ev_charging(
     hours=12
 ):
     prices = get_ontario_prices(hours)
-    energy_needed = (target_soc_pct - current_soc_pct) / 100 * ev_capacity_kwh
+    energy_needed = (
+        target_soc_pct - current_soc_pct
+    ) / 100 * ev_capacity_kwh
 
     prob = LpProblem("EV_Charging", LpMinimize)
 
@@ -187,3 +193,4 @@ def get_optimization_explanation(results):
     )
 
     return explanations
+

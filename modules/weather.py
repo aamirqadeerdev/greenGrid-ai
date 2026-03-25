@@ -6,6 +6,9 @@ import config
 
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
+import streamlit as st
+
+@st.cache_data(ttl=3600)
 def get_weather_forecast():
     params = {
         "latitude": config.SITE_LATITUDE,
