@@ -1,4 +1,5 @@
 
+
 import streamlit as st
 import base64
 import os
@@ -7,6 +8,56 @@ st.set_page_config(
     page_title="GreenGrid AI",
     layout="wide"
 )
+
+# ---------------------------------------------------------------------------
+# PASSWORD PROTECTION
+# ---------------------------------------------------------------------------
+def check_password():
+    def password_entered():
+        if st.session_state["password"] == st.secrets["APP_PASSWORD"]:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # --- Login UI ---
+    st.markdown("""
+    <style>
+    .login-header {
+        font-size: 28px;
+        font-weight: bold;
+        color: #00cc44;
+        margin-bottom: 4px;
+    }
+    .login-sub {
+        font-size: 14px;
+        color: #888888;
+        margin-bottom: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1, 1.5, 1])
+    with col2:
+        st.markdown('<p class="login-header">🌿 GreenGrid AI</p>', unsafe_allow_html=True)
+        st.markdown('<p class="login-sub">Smart Distributed Energy Resource Management System</p>', unsafe_allow_html=True)
+        st.text_input("🔒 Enter Password", type="password", on_change=password_entered, key="password")
+        if "password_correct" in st.session_state and not st.session_state["password_correct"]:
+            st.error("❌ Incorrect password. Please try again.")
+        st.caption("Authorized users only. © 2026 Aamir Qadeer")
+
+    return False
+
+
+if not check_password():
+    st.stop()
+
+# ---------------------------------------------------------------------------
+# MAIN APP (only rendered after correct password)
+# ---------------------------------------------------------------------------
 
 # --- Encode image to base64 for embedding ----------------------------------
 def get_image_base64(image_path):
@@ -146,4 +197,5 @@ with col4:
 
 st.divider()
 st.caption("GreenGrid AI v1.0 — © 2026 Aamir Qadeer — AI & Energy Engineer — All Rights Reserved")
+
 
